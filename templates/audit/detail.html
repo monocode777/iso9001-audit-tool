@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Auditoría - {{ audit.project_name }} - Herramienta ISO 9001{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Auditoría: {{ audit.project_name }}</h1>
+    <div>
+        <span class="badge bg-{% if audit.status == 'completed' %}success{% elif audit.status == 'in-progress' %}warning{% else %}secondary{% endif %}">
+            {{ audit.status }}
+        </span>
+        {% if audit.status != 'completed' %}
+        <a href="{{ url_for('complete_audit', audit_id=audit.id) }}" class="btn btn-sm btn-success">Marcar como Completada</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Información del Proyecto</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Descripción:</strong> {{ audit.description or 'Sin descripción' }}</p>
+                <p><strong>Creada por:</strong> User ID: {{ audit.created_by }}</p>
+                <p><strong>Fecha de creación:</strong> {{ audit.created_at.strftime('%d/%m/%Y %H:%M') }}</p>
+                {% if audit.completed_at %}
+                <p><strong>Completada el:</strong> {{ audit.completed_at.strftime('%d/%m/%Y %H:%M') }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title">Requisitos ISO 9001</h5>
+            </div>
+            <div class="card-body">
+                {% for item in items %}
+                <div class="audit-item {% if item.compliance %}compliant{% else %}non-compliant{% endif %} mb-3 p-3 border rounded">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <span class="iso-clause badge bg-secondary">{{ item.iso_clause }}</span>
+                            <h6 class="requirement-text mt-2">{{ item.requirement }}</h6>
+                            {% if item.comments %}
+                            <p class="mt-2"><strong>Comentarios:</strong> {{ item.comments }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input compliance-toggle" type="checkbox" 
+                                   data-item-id="{{ item.id }}" 
+                                   {% if item.compliance %}checked{% endif %}>
+                            <label class="form-check-label">
+                                {% if item.compliance %}Cumple{% else %}No cumple{% endif %}
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <textarea class="form-control comments-field" data-item-id="{{ item.id }}" 
+                                  placeholder="Agregar comentarios..." rows="2">{{ item.comments or '' }}</textarea>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title">Cargar Documentos</h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('upload_document') }}" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="audit_id" value="{{ audit.id }}">
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Seleccionar archivo</label>
+                        <input class="form-control" type="file" id="file" name="file" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Subir Documento</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Documentos Cargados</h5>
+            </div>
+            <div class="card-body">
+                {% if documents %}
+                <div class="list-group">
+                    {% for doc in documents %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>{{ doc.original_filename }}</span>
+                            <small class="text-muted">{{ doc.uploaded_at.strftime('%d/%m/%Y') }}</small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">No hay documentos cargados</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Manejar cambio de cumplimiento
+    document.querySelectorAll('.compliance-toggle').forEach(toggle => {
+        toggle.addEventListener('change', function() {
+            const itemId = this.dataset.itemId;
+            const compliance = this.checked;
+            
+            fetch('{{ url_for("update_audit_item") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `item_id=${itemId}&compliance=${compliance}`
+            });
+        });
+    });
+    
+    // Manejar comentarios (guardar cuando se pierde el foco)
+    document.querySelectorAll('.comments-field').forEach(textarea => {
+        textarea.addEventListener('blur', function() {
+            const itemId = this.dataset.itemId;
+            const comments = this.value;
+            
+            fetch('{{ url_for("update_audit_item") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `item_id=${itemId}&comments=${encodeURIComponent(comments)}`
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

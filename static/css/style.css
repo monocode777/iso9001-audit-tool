@@ -1,0 +1,453 @@
+:root {
+    --primary-pastel: #ffcccc;
+    --secondary-pastel: #ffdddd;
+    --accent-pastel: #ffeeee;
+    --text-dark: #5a3e3e;
+    --text-light: #7a5c5c;
+    --success-pastel: #d4edda;
+    --warning-pastel: #fff3cd;
+    --danger-pastel: #f8d7da;
+    --info-pastel: #d1ecf1;
+    --sidebar-bg: #fff5f5;
+    --card-border: #ffb3b3;
+    --header-bg: #ff6666;
+    --hover-effect: #ffe6e6;
+}
+
+body {
+    background-color: #fffafa;
+    color: var(--text-dark);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Sidebar mejorado */
+.sidebar {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--sidebar-bg) 0%, #ffe6e6 100%);
+    box-shadow: 2px 0 10px rgba(255, 102, 102, 0.1);
+    border-right: 1px solid var(--card-border);
+}
+
+.sidebar .nav-link {
+    color: var(--text-dark);
+    border-radius: 8px;
+    margin: 2px 0;
+    padding: 12px 15px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.sidebar .nav-link.active {
+    background: linear-gradient(135deg, var(--header-bg) 0%, #ff8888 100%);
+    color: white;
+    box-shadow: 0 4px 8px rgba(255, 102, 102, 0.3);
+}
+
+.sidebar .nav-link:hover:not(.active) {
+    background-color: var(--hover-effect);
+    color: var(--text-dark);
+    transform: translateX(5px);
+}
+
+.sidebar .fs-4 {
+    color: var(--header-bg);
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Cards con estilo pastel */
+.card {
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(255, 102, 102, 0.1);
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.card:hover {
+    box-shadow: 0 8px 20px rgba(255, 102, 102, 0.15);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--primary-pastel) 0%, var(--secondary-pastel) 100%);
+    border-bottom: 1px solid var(--card-border);
+    color: var(--text-dark);
+    font-weight: 600;
+    border-radius: 12px 12px 0 0 !important;
+}
+
+/* Botones con tema rojo pastel */
+.btn-primary {
+    background: linear-gradient(135deg, var(--header-bg) 0%, #ff8888 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #ff5555 0%, #ff7777 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 102, 102, 0.3);
+}
+
+.btn-outline-primary {
+    border: 2px solid var(--header-bg);
+    color: var(--header-bg);
+    border-radius: 8px;
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+    background: var(--header-bg);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Alertas con colores pastel */
+.alert-info {
+    background: linear-gradient(135deg, var(--info-pastel) 0%, #e3f2fd 100%);
+    border: 1px solid #b8daff;
+    color: var(--text-light);
+}
+
+.alert-success {
+    background: linear-gradient(135deg, var(--success-pastel) 0%, #e8f5e9 100%);
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, var(--warning-pastel) 0%, #fff9c4 100%);
+    border: 1px solid #ffeaa7;
+    color: #856404;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, var(--danger-pastel) 0%, #ffebee 100%);
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+/* Badges mejorados */
+.badge {
+    border-radius: 12px;
+    padding: 6px 12px;
+    font-weight: 500;
+}
+
+.bg-primary {
+    background: linear-gradient(135deg, var(--header-bg) 0%, #ff8888 100%) !important;
+}
+
+.bg-success {
+    background: linear-gradient(135deg, #28a745 0%, #5cb85c 100%) !important;
+}
+
+.bg-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #ffce3a 100%) !important;
+}
+
+.bg-secondary {
+    background: linear-gradient(135deg, #6c757d 0%, #868e96 100%) !important;
+}
+
+/* Tablas mejoradas */
+.table {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(255, 102, 102, 0.1);
+}
+
+.table th {
+    background: linear-gradient(135deg, var(--primary-pastel) 0%, var(--secondary-pastel) 100%);
+    color: var(--text-dark);
+    border: none;
+    font-weight: 600;
+}
+
+.table td {
+    border-color: var(--card-border);
+    vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--accent-pastel);
+    transition: background-color 0.2s ease;
+}
+
+/* Formularios mejorados */
+.form-control {
+    border: 2px solid var(--card-border);
+    border-radius: 8px;
+    padding: 10px 15px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--header-bg);
+    box-shadow: 0 0 0 0.2rem rgba(255, 102, 102, 0.25);
+}
+
+.form-select {
+    border: 2px solid var(--card-border);
+    border-radius: 8px;
+    padding: 10px 15px;
+}
+
+.form-select:focus {
+    border-color: var(--header-bg);
+    box-shadow: 0 0 0 0.2rem rgba(255, 102, 102, 0.25);
+}
+
+/* Progress bars */
+.progress {
+    background-color: var(--secondary-pastel);
+    border-radius: 10px;
+    height: 12px;
+}
+
+.progress-bar {
+    background: linear-gradient(135deg, var(--header-bg) 0%, #ff8888 100%);
+    border-radius: 10px;
+}
+
+/* List group mejorado */
+.list-group-item {
+    border: 1px solid var(--card-border);
+    margin: 5px 0;
+    border-radius: 8px !important;
+    transition: all 0.3s ease;
+}
+
+.list-group-item:hover {
+    background-color: var(--accent-pastel);
+    border-color: var(--header-bg);
+    transform: translateX(5px);
+}
+
+/* Audit items mejorados */
+.audit-item {
+    border-left: 4px solid var(--card-border);
+    padding: 15px 20px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.audit-item.compliant {
+    border-left-color: #28a745;
+    background: linear-gradient(135deg, var(--success-pastel) 0%, #e8f5e9 100%);
+}
+
+.audit-item.non-compliant {
+    border-left-color: #dc3545;
+    background: linear-gradient(135deg, var(--danger-pastel) 0%, #ffebee 100%);
+}
+
+.audit-item:hover {
+    box-shadow: 0 4px 12px rgba(255, 102, 102, 0.15);
+}
+
+/* Switch personalizado */
+.form-check-input:checked {
+    background-color: var(--header-bg);
+    border-color: var(--header-bg);
+}
+
+/* Header y títulos */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+.border-bottom {
+    border-color: var(--card-border) !important;
+}
+
+/* Efectos de hover para cards de capacitación */
+.training-card {
+    transition: all 0.3s ease;
+}
+
+.training-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(255, 102, 102, 0.2);
+}
+
+/* Iconos y emojis */
+.material-icon {
+    font-size: 3rem;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+    filter: drop-shadow(2px 2px 4px rgba(255, 102, 102, 0.3));
+}
+
+.material-icon:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Navbar y dropdown */
+.dropdown-menu {
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(255, 102, 102, 0.15);
+}
+
+.dropdown-item:hover {
+    background-color: var(--accent-pastel);
+    color: var(--text-dark);
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .sidebar {
+        min-height: auto;
+    }
+    
+    .card {
+        margin-bottom: 15px;
+    }
+    
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+
+/* Animaciones suaves */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Efecto de carga */
+.loading-spinner {
+    border: 3px solid var(--secondary-pastel);
+    border-top: 3px solid var(--header-bg);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Mejoras para la página de login */
+.bg-light {
+    background: linear-gradient(135deg, #fffafa 0%, #ffe6e6 100%) !important;
+}
+
+.card.shadow {
+    box-shadow: 0 8px 25px rgba(255, 102, 102, 0.2) !important;
+    border: 1px solid var(--card-border);
+}
+
+.card-header.bg-primary {
+    background: linear-gradient(135deg, var(--header-bg) 0%, #ff8888 100%) !important;
+}
+/* Estilos específicos para el login con imagen de fondo más fuerte */
+.login-container {
+    min-height: 100vh;
+    background: linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 245, 245, 0.8)), 
+                url('../images/iso.jpg') center/cover no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+}
+
+/* Efecto de overlay más transparente para que la imagen se vea mejor */
+.login-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.3);
+    z-index: 1;
+}
+
+.login-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(5px);
+    border: 2px solid var(--card-border);
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(255, 102, 102, 0.3);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.login-header {
+    background: linear-gradient(135deg, rgba(255, 102, 102, 0.9) 0%, rgba(255, 136, 136, 0.9) 100%);
+    padding: 30px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.login-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('../images/iso.jpg') center/cover;
+    opacity: 0.4; /* Aumentamos la opacidad de la imagen en el header */
+    z-index: 1;
+}
+
+.login-title {
+    position: relative;
+    z-index: 2;
+    color: white;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+    font-weight: bold;
+}
+
+/* Efecto de paralax para la imagen de fondo */
+.login-container {
+    background-attachment: fixed;
+}
+
+/* Mejorar el contraste del contenido */
+.login-body {
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.98);
+}
+
+.login-input {
+    border: 2px solid var(--card-border);
+    border-radius: 10px;
+    padding: 12px 20px;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+/* Mejorar visibilidad de las credenciales */
+.login-credentials {
+    background: linear-gradient(135deg, rgba(209, 236, 241, 0.9) 0%, rgba(227, 242, 253, 0.9) 100%);
+    border: 2px solid #b8daff;
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 20px;
+    backdrop-filter: blur(5px);
+}

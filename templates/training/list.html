@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Capacitación - Herramienta ISO 9001{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Material de Capacitación</h1>
+    <a href="{{ url_for('upload_training_material') }}" class="btn btn-success">
+        📤 Subir Material
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="alert alert-info">
+            <h5>Bienvenido al panel de capacitación ISO 9001</h5>
+            <p>Aquí encontrarás materiales de formación sobre la norma ISO 9001 y su aplicación en proyectos de software.</p>
+        </div>
+
+        <!-- Documentación de Google Drive -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">📚 Documentación Oficial ISO 9001</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="card-title">Norma ISO 9001:2015</h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">Documentación completa sobre los requisitos de la norma ISO 9001:2015 para sistemas de gestión de calidad.</p>
+                                <ul class="list-unstyled">
+                                    <li>📄 Requisitos generales</li>
+                                    <li>📊 Procesos y documentación</li>
+                                    <li>✅ Mejora continua</li>
+                                    <li>🔍 Enfoque basado en procesos</li>
+                                </ul>
+                            </div>
+                            <div class="card-footer">
+                                <a href="https://drive.google.com/drive/folders/1oZ4-NeVQSxsYVd3Mko-0r9OOE2Yip1vL" 
+                                   target="_blank" class="btn btn-primary btn-sm">
+                                    Acceder a Documentación
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="card-title">Guías de Implementación</h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">Guías prácticas para implementar ISO 9001 en proyectos de desarrollo de software.</p>
+                                <ul class="list-unstyled">
+                                    <li>🛠️ Herramientas de implementación</li>
+                                    <li>📋 Checklist de verificación</li>
+                                    <li>📝 Formatos y plantillas</li>
+                                    <li>🎓 Material de entrenamiento</li>
+                                </ul>
+                            </div>
+                            <div class="card-footer">
+                                <a href="https://drive.google.com/drive/folders/1d2AXA8215YzyH4iQBLb0qJ6HUuMe447v" 
+                                   target="_blank" class="btn btn-primary btn-sm">
+                                    Acceder a Guías
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Materiales locales -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">🎓 Materiales de Capacitación Internos</h5>
+            </div>
+            <div class="card-body">
+                {% if materials %}
+                <div class="row">
+                    {% for material in materials %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="text-center mb-3" style="font-size: 2.5rem;">
+                                    {% if material.file_type == 'pdf' %}📄
+                                    {% elif material.file_type == 'video' %}🎥
+                                    {% elif material.file_type == 'presentation' %}📊
+                                    {% else %}📁{% endif %}
+                                </div>
+                                <h6>{{ material.title }}</h6>
+                                <p class="small text-muted">{{ material.description|truncate(100) }}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-{% if material.level == 'basic' %}success{% elif material.level == 'intermediate' %}warning{% else %}danger{% endif %}">
+                                        {{ material.level }}
+                                    </span>
+                                    <small>{{ material.uploaded_at.strftime('%d/%m/%Y') }}</small>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                {% if material.filename %}
+                                <a href="{{ url_for('download_training_material', material_id=material.id) }}" class="btn btn-outline-primary btn-sm w-100">
+                                    Descargar
+                                </a>
+                                {% elif material.file_url %}
+                                <a href="{{ material.file_url }}" target="_blank" class="btn btn-outline-primary btn-sm w-100">
+                                    Ver Enlace
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <div style="font-size: 4rem;">📚</div>
+                    <h5>No hay materiales disponibles</h5>
+                    <p class="text-muted">Sube el primer material de capacitación</p>
+                    <a href="{{ url_for('upload_training_material') }}" class="btn btn-primary">
+                        Subir Material
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Progreso de capacitación -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">📊 Mi Progreso de Capacitación</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Módulos Completados</h6>
+                        <div class="progress mb-3">
+                            <div class="progress-bar" role="progressbar" style="width: 65%" aria-valuenow="65" aria-valuemin="0" aria-valuemax="100">65%</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Próxima Certificación</h6>
+                        <div class="alert alert-warning">
+                            <strong>Auditor Interno ISO 9001</strong><br>
+                            Fecha estimada: 15/12/2024
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

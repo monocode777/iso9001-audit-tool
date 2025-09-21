@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Auditorías - Herramienta ISO 9001{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Lista de Auditorías</h1>
+    <a href="{{ url_for('create_audit') }}" class="btn btn-primary">Nueva Auditoría</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Proyecto</th>
+                <th>Estado</th>
+                <th>Fecha Creación</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for audit in audits %}
+            <tr>
+                <td>{{ audit.project_name }}</td>
+                <td>
+                    <span class="badge bg-{% if audit.status == 'completed' %}success{% elif audit.status == 'in-progress' %}warning{% else %}secondary{% endif %}">
+                        {{ audit.status }}
+                    </span>
+                </td>
+                <td>{{ audit.created_at.strftime('%d/%m/%Y') }}</td>
+                <td>
+                    <a href="{{ url_for('audit_detail', audit_id=audit.id) }}" class="btn btn-sm btn-outline-primary">Ver</a>
+                    {% if audit.status != 'completed' %}
+                    <a href="{{ url_for('complete_audit', audit_id=audit.id) }}" class="btn btn-sm btn-outline-success">Completar</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" class="text-center">No hay auditorías registradas</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

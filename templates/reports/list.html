@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Reportes - Herramienta ISO 9001{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Generar Reportes</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Reportes de Auditorías</h5>
+            </div>
+            <div class="card-body">
+                {% if audits %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Proyecto</th>
+                                <th>Estado</th>
+                                <th>Fecha Creación</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for audit in audits %}
+                            <tr>
+                                <td>{{ audit.project_name }}</td>
+                                <td>
+                                    <span class="badge bg-{% if audit.status == 'completed' %}success{% elif audit.status == 'in-progress' %}warning{% else %}secondary{% endif %}">
+                                        {{ audit.status }}
+                                    </span>
+                                </td>
+                                <td>{{ audit.created_at.strftime('%d/%m/%Y') }}</td>
+                                <td>
+                                    <a href="{{ url_for('generate_report', audit_id=audit.id) }}" class="btn btn-sm btn-primary">
+                                        Generar Reporte CSV
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No hay auditorías para generar reportes.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

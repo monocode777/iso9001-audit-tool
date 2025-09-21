@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Herramienta ISO 9001{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4">Dashboard</h1>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Total Auditorías</h5>
+                    <h2 class="card-text">{{ total_audits }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Completadas</h5>
+                    <h2 class="card-text">{{ completed_audits }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-warning text-dark mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Pendientes</h5>
+                    <h2 class="card-text">{{ pending_audits }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Acciones Rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('create_audit') }}" class="btn btn-primary">Crear Nueva Auditoría</a>
+                        <a href="{{ url_for('audits') }}" class="btn btn-outline-primary">Ver Todas las Auditorías</a>
+                        <a href="{{ url_for('training') }}" class="btn btn-outline-success">Material de Capacitación</a>
+                        <a href="{{ url_for('reports') }}" class="btn btn-outline-info">Generar Reportes</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Auditorías Recientes</h5>
+                </div>
+                <div class="card-body">
+                    {% if audits %}
+                    <div class="list-group">
+                        {% for audit in audits %}
+                        <a href="{{ url_for('audit_detail', audit_id=audit.id) }}" 
+                           class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ audit.project_name }}</h6>
+                                <small class="text-{% if audit.status == 'completed' %}success{% elif audit.status == 'in-progress' %}warning{% else %}danger{% endif %}">
+                                    {{ audit.status }}
+                                </small>
+                            </div>
+                            <small class="text-muted">Creada el: {{ audit.created_at.strftime('%d/%m/%Y') }}</small>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No hay auditorías registradas.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

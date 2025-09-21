@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Subir Material - Herramienta ISO 9001{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Subir Material de Capacitación</h1>
+    <a href="{{ url_for('training') }}" class="btn btn-secondary">← Volver</a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Nuevo Material</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Título del Material *</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" placeholder="Describe el contenido del material..."></textarea>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="file_type" class="form-label">Tipo de Archivo *</label>
+                            <select class="form-select" id="file_type" name="file_type" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="pdf">PDF/Documento</option>
+                                <option value="video">Video</option>
+                                <option value="presentation">Presentación</option>
+                                <option value="external">Enlace Externo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="level" class="form-label">Nivel *</label>
+                            <select class="form-select" id="level" name="level" required>
+                                <option value="">Seleccionar...</option>
+                                <option value="basic">Básico</option>
+                                <option value="intermediate">Intermedio</option>
+                                <option value="advanced">Avanzado</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3" id="fileUploadSection">
+                        <label for="file" class="form-label">Subir Archivo</label>
+                        <input class="form-control" type="file" id="file" name="file">
+                        <div class="form-text">Formatos aceptados: PDF, MP4, PPTX, DOCX (Máx. 50MB)</div>
+                    </div>
+                    
+                    <div class="mb-3 d-none" id="urlSection">
+                        <label for="file_url" class="form-label">URL del Material</label>
+                        <input type="url" class="form-control" id="file_url" name="file_url" placeholder="https://...">
+                        <div class="form-text">Ej: https://drive.google.com/drive/folders/...</div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('training') }}" class="btn btn-secondary me-md-2">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Subir Material</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h6>📋 Recomendaciones</h6>
+            </div>
+            <div class="card-body">
+                <ul class="small">
+                    <li>Use formatos PDF para documentos</li>
+                    <li>Videos en MP4 recomendados</li>
+                    <li>Tamaño máximo: 50MB por archivo</li>
+                    <li>Para enlaces externos, asegure que sean accesibles</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6>🔗 Enlaces de Google Drive</h6>
+            </div>
+            <div class="card-body">
+                <p class="small">Puede usar estos enlaces como referencia:</p>
+                <ul class="small">
+                    <li><a href="https://drive.google.com/drive/folders/1oZ4-NeVQSxsYVd3Mko-0r9OOE2Yip1vL" target="_blank" class="text-decoration-none">📁 Norma ISO 9001</a></li>
+                    <li><a href="https://drive.google.com/drive/folders/1d2AXA8215YzyH4iQBLb0qJ6HUuMe447v" target="_blank" class="text-decoration-none">📁 Guías de Implementación</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6>ℹ️ Información</h6>
+            </div>
+            <div class="card-body">
+                <p class="small">Los materiales serán revisados por el administrador antes de ser publicados para todos los usuarios.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileTypeSelect = document.getElementById('file_type');
+    const fileUploadSection = document.getElementById('fileUploadSection');
+    const urlSection = document.getElementById('urlSection');
+    
+    fileTypeSelect.addEventListener('change', function() {
+        if (this.value === 'external') {
+            fileUploadSection.classList.add('d-none');
+            urlSection.classList.remove('d-none');
+            // Hacer el campo de URL requerido
+            document.getElementById('file_url').required = true;
+            // Quitar requerido del campo de archivo
+            document.getElementById('file').required = false;
+        } else {
+            fileUploadSection.classList.remove('d-none');
+            urlSection.classList.add('d-none');
+            // Hacer el campo de archivo requerido
+            document.getElementById('file').required = true;
+            // Quitar requerido del campo de URL
+            document.getElementById('file_url').required = false;
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

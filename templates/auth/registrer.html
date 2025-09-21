@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Herramienta ISO 9001</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <style>
+        .register-container {
+            min-height: 100vh;
+            background: linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 245, 245, 0.7)), 
+                        url('{{ url_for("static", filename="images/iso.jpg") }}') center/cover no-repeat fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .register-card {
+            background: rgba(255, 255, 255, 0.98);
+            border: 3px solid #ff6666;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(255, 102, 102, 0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .register-header {
+            background: linear-gradient(135deg, rgba(255, 102, 102, 0.9) 0%, rgba(255, 136, 136, 0.9) 100%);
+            padding: 25px;
+            text-align: center;
+            color: white;
+        }
+
+        .register-body {
+            padding: 30px;
+        }
+
+        .password-strength {
+            height: 5px;
+            margin-top: 5px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-card">
+            <div class="register-header">
+                <h3><i class="fas fa-user-plus me-2"></i>Crear Cuenta</h3>
+                <p class="mb-0">Sistema de gestión de calidad ISO 9001</p>
+            </div>
+            
+            <div class="register-body">
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="{{ url_for('register') }}" id="registerForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-user me-2"></i>Nombre *</label>
+                            <input type="text" class="form-control" name="first_name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-user me-2"></i>Apellido *</label>
+                            <input type="text" class="form-control" name="last_name" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-at me-2"></i>Usuario *</label>
+                        <input type="text" class="form-control" name="username" required 
+                               pattern="[a-zA-Z0-9_]+" title="Solo letras, números y guiones bajos">
+                        <small class="text-muted">Solo letras, números y _</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-envelope me-2"></i>Email *</label>
+                        <input type="email" class="form-control" name="email" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-building me-2"></i>Departamento</label>
+                            <input type="text" class="form-control" name="department">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><i class="fas fa-briefcase me-2"></i>Cargo</label>
+                            <input type="text" class="form-control" name="position">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-lock me-2"></i>Contraseña *</label>
+                        <input type="password" class="form-control" name="password" id="password" required 
+                               minlength="6">
+                        <div class="password-strength bg-secondary mt-2" id="passwordStrength"></div>
+                        <small class="text-muted">Mínimo 6 caracteres</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-lock me-2"></i>Confirmar Contraseña *</label>
+                        <input type="password" class="form-control" name="confirm_password" required>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-user-plus me-2"></i>Crear Cuenta
+                        </button>
+                        <a href="{{ url_for('login') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-sign-in-alt me-2"></i>Volver al Login
+                        </a>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            Al registrarte, aceptas nuestros <a href="#">Términos de Servicio</a> 
+                            y <a href="#">Política de Privacidad</a>
+                        </small>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.getElementById('password');
+            const strengthBar = document.getElementById('passwordStrength');
+            
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                let strength = 0;
+                
+                if (password.length >= 6) strength += 25;
+                if (password.length >= 8) strength += 25;
+                if (/[A-Z]/.test(password)) strength += 25;
+                if (/[0-9]/.test(password)) strength += 25;
+                
+                strengthBar.style.width = strength + '%';
+                
+                if (strength < 50) {
+                    strengthBar.className = 'password-strength bg-danger';
+                } else if (strength < 75) {
+                    strengthBar.className = 'password-strength bg-warning';
+                } else {
+                    strengthBar.className = 'password-strength bg-success';
+                }
+            });
+            
+            // Validación de confirmación de contraseña
+            const form = document.getElementById('registerForm');
+            form.addEventListener('submit', function(e) {
+                const password = document.querySelector('input[name="password"]').value;
+                const confirmPassword = document.querySelector('input[name="confirm_password"]').value;
+                
+                if (password !== confirmPassword) {
+                    e.preventDefault();
+                    alert('Las contraseñas no coinciden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
