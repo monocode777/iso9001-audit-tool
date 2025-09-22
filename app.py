@@ -6,14 +6,14 @@ from werkzeug.utils import secure_filename
 import os
 from datetime import datetime
 import csv
-from io import StringIO, BytesIO  
-from flask_migrate import Migrate
+from io import StringIO, BytesIO
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'iso9001-secret-key-change-in-production'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///iso9001.db'
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 login_manager = LoginManager()
@@ -22,43 +22,13 @@ login_manager.login_view = 'login'
 
 # Modelos de la base de datos
 class User(UserMixin, db.Model):
+    __tablename__ = 'users'
+    
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(120), nullable=False)
-    role = db.Column(db.String(20), nullable=False)  # auditor, user, admin
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-
-class Audit(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    project_name = db.Column(db.String(200), nullable=False)
-    description = db.Column(db.Text, nullable=True)
-    status = db.Column(db.String(20), default='pending')  # pending, in-progress, completed
-    created_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    completed_at = db.Column(db.DateTime, nullable=True)
-
-class AuditItem(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    audit_id = db.Column(db.Integer, db.ForeignKey('audit.id'), nullable=False)
-    iso_clause = db.Column(db.String(50), nullable=False)
-    requirement = db.Column(db.Text, nullable=False)
-    compliance = db.Column(db.Boolean, default=False)
-    comments = db.Column(db.Text, nullable=True)
-    evidence = db.Column(db.String(300), nullable=True)
-
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(120), nullable=False)
-    role = db.Column(db.String(20), nullable=False, default='user')  # auditor, user, admin
+    role = db.Column(db.String(20), nullable=False, default='user')
     first_name = db.Column(db.String(100), nullable=True)
     last_name = db.Column(db.String(100), nullable=True)
     department = db.Column(db.String(100), nullable=True)
@@ -73,25 +43,50 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+class Audit(db.Model):
+    __tablename__ = 'audits'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    project_name = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    status = db.Column(db.String(20), default='pending')
+    created_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    completed_at = db.Column(db.DateTime, nullable=True)
+
+class AuditItem(db.Model):
+    __tablename__ = 'audit_items'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    audit_id = db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=False)
+    iso_clause = db.Column(db.String(50), nullable=False)
+    requirement = db.Column(db.Text, nullable=False)
+    compliance = db.Column(db.Boolean, default=False)
+    comments = db.Column(db.Text, nullable=True)
+    evidence = db.Column(db.String(300), nullable=True)
+
 class Document(db.Model):
+    __tablename__ = 'documents'
+    
     id = db.Column(db.Integer, primary_key=True)
     filename = db.Column(db.String(300), nullable=False)
     original_filename = db.Column(db.String(300), nullable=False)
-    uploaded_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    uploaded_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
-    audit_id = db.Column(db.Integer, db.ForeignKey('audit.id'), nullable=True)
+    audit_id = db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=True)
 
 class TrainingMaterial(db.Model):
+    __tablename__ = 'training_materials'
+    
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text, nullable=True)
-    # Campos nuevos con valores por defecto para compatibilidad
-    file_type = db.Column(db.String(50), default='pdf')
-    level = db.Column(db.String(20), default='basic')
+    file_type = db.Column(db.String(50), nullable=False)
+    level = db.Column(db.String(20), nullable=False)
     duration = db.Column(db.String(20), nullable=True)
     filename = db.Column(db.String(300), nullable=True)
     file_url = db.Column(db.String(500), nullable=True)
-    uploaded_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    uploaded_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_active = db.Column(db.Boolean, default=True)
 
@@ -104,29 +99,50 @@ def init_db():
     with app.app_context():
         db.create_all()
         
-        # Verificar y agregar columnas faltantes si es necesario
-        try:
-            # Intentar una consulta simple para verificar si las columnas nuevas existen
-            test = TrainingMaterial.query.first()
-        except Exception as e:
-            print("Columnas faltantes detectadas, intentando migrar...")
-            # Aquí podrías agregar lógica para migrar la base de datos
-            # Por simplicidad, recreamos la tabla
-            TrainingMaterial.__table__.drop(db.engine)
-            db.create_all()
-            print("Base de datos migrada exitosamente")
-        
         # Crear usuario administrador por defecto si no existe
         if not User.query.filter_by(username='admin').first():
             admin_user = User(
                 username='admin',
                 email='admin@example.com',
-                role='admin'
+                first_name='Administrador',
+                last_name='Sistema',
+                department='TI',
+                position='Administrador del Sistema',
+                role='admin',
+                is_active=True
             )
             admin_user.set_password('admin123')
             db.session.add(admin_user)
             db.session.commit()
             print("Usuario admin creado: admin / admin123")
+
+# Rutas de autenticación
+@app.route('/')
+def index():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+    return render_template('auth/login.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        user = User.query.filter_by(username=username).first()
+        
+        if user and user.check_password(password) and user.is_active:
+            # Actualizar último login
+            user.last_login = datetime.utcnow()
+            db.session.commit()
+            
+            login_user(user)
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('dashboard'))
+        elif user and not user.is_active:
+            flash('Tu cuenta está desactivada. Contacta al administrador.')
+        else:
+            flash('Usuario o contraseña incorrectos')
+    return render_template('auth/login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -176,7 +192,8 @@ def register():
                 last_name=last_name,
                 department=department,
                 position=position,
-                role='user'  # Rol por defecto
+                role='user',
+                is_active=True
             )
             new_user.set_password(password)
             
@@ -192,75 +209,6 @@ def register():
             return render_template('auth/register.html')
     
     return render_template('auth/register.html')
-
-@app.route('/admin/users')
-@login_required
-def user_management():
-    # Solo administradores pueden gestionar usuarios
-    if current_user.role != 'admin':
-        flash('No tienes permisos para acceder a esta página.')
-        return redirect(url_for('dashboard'))
-    
-    users = User.query.all()
-    return render_template('admin/users.html', users=users)
-
-@app.route('/admin/user/toggle/<int:user_id>')
-@login_required
-def toggle_user_status(user_id):
-    if current_user.role != 'admin':
-        flash('No tienes permisos para realizar esta acción.')
-        return redirect(url_for('dashboard'))
-    
-    user = User.query.get_or_404(user_id)
-    user.is_active = not user.is_active
-    db.session.commit()
-    
-    flash(f'Usuario {"activado" if user.is_active else "desactivado"} correctamente.')
-    return redirect(url_for('user_management'))
-
-@app.route('/admin/user/delete/<int:user_id>')
-@login_required
-def delete_user(user_id):
-    if current_user.role != 'admin':
-        flash('No tienes permisos para realizar esta acción.')
-        return redirect(url_for('dashboard'))
-    
-    user = User.query.get_or_404(user_id)
-    
-    # No permitir eliminar el propio usuario admin
-    if user.id == current_user.id:
-        flash('No puedes eliminar tu propia cuenta.')
-        return redirect(url_for('user_management'))
-    
-    db.session.delete(user)
-    db.session.commit()
-    
-    flash('Usuario eliminado correctamente.')
-    return redirect(url_for('user_management'))
-
-
-
-# Rutas de autenticación
-@app.route('/')
-def index():
-    if current_user.is_authenticated:
-        return redirect(url_for('dashboard'))
-    return render_template('auth/login.html')
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
-        user = User.query.filter_by(username=username).first()
-        
-        if user and user.check_password(password):
-            login_user(user)
-            next_page = request.args.get('next')
-            return redirect(next_page or url_for('dashboard'))
-        else:
-            flash('Usuario o contraseña incorrectos')
-    return render_template('auth/login.html')
 
 @app.route('/logout')
 @login_required
@@ -510,14 +458,14 @@ def generate_report(audit_id):
     audit = Audit.query.get_or_404(audit_id)
     items = AuditItem.query.filter_by(audit_id=audit_id).all()
     
-    # Crear CSV en memoria como bytes
+    # Crear datos CSV
     output = StringIO()
     writer = csv.writer(output)
     
-    # Escribir encabezados
+    # Escribir encabezado
     writer.writerow(['Cláusula ISO', 'Requisito', 'Cumplimiento', 'Comentarios'])
     
-    # Escribir datos
+    # Escribir filas de datos
     for item in items:
         writer.writerow([
             item.iso_clause,
@@ -526,21 +474,71 @@ def generate_report(audit_id):
             item.comments or 'N/A'
         ])
     
-    # Preparar respuesta - convertir a bytes
+    # Obtener el contenido CSV y codificar como bytes
     csv_data = output.getvalue()
     csv_bytes = csv_data.encode('utf-8')
     
-    # Crear BytesIO con los datos codificados
+    # Crear un buffer de bytes para send_file
     csv_buffer = BytesIO(csv_bytes)
     csv_buffer.seek(0)
     
-    # Devolver como archivo descargable
+    # Devolver el archivo CSV
     return send_file(
         csv_buffer,
         mimetype='text/csv',
         as_attachment=True,
         download_name=f'reporte_auditoria_{audit.project_name}.csv'
     )
+
+@app.route('/admin/users')
+@login_required
+def user_management():
+    # Solo administradores pueden gestionar usuarios
+    if current_user.role != 'admin':
+        flash('No tienes permisos para acceder a esta página.')
+        return redirect(url_for('dashboard'))
+    
+    users = User.query.all()
+    return render_template('admin/users.html', users=users)
+
+@app.route('/admin/user/toggle/<int:user_id>')
+@login_required
+def toggle_user_status(user_id):
+    if current_user.role != 'admin':
+        flash('No tienes permisos para realizar esta acción.')
+        return redirect(url_for('dashboard'))
+    
+    user = User.query.get_or_404(user_id)
+    user.is_active = not user.is_active
+    db.session.commit()
+    
+    flash(f'Usuario {"activado" if user.is_active else "desactivado"} correctamente.')
+    return redirect(url_for('user_management'))
+
+@app.route('/admin/user/delete/<int:user_id>')
+@login_required
+def delete_user(user_id):
+    if current_user.role != 'admin':
+        flash('No tienes permisos para realizar esta acción.')
+        return redirect(url_for('dashboard'))
+    
+    user = User.query.get_or_404(user_id)
+    
+    # No permitir eliminar el propio usuario admin
+    if user.id == current_user.id:
+        flash('No puedes eliminar tu propia cuenta.')
+        return redirect(url_for('user_management'))
+    
+    db.session.delete(user)
+    db.session.commit()
+    
+    flash('Usuario eliminado correctamente.')
+    return redirect(url_for('user_management'))
+
+@app.route('/profile')
+@login_required
+def profile():
+    return render_template('auth/profile.html', user=current_user)
 
 if __name__ == '__main__':
     # Inicializar la base de datos
